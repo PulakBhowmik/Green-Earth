@@ -166,99 +166,109 @@ const handleCart = (e) => {
   const parent = e.target.parentNode.parentNode;
   const id = parent.parentNode.id;
   const title = parent.querySelector(".card-title").textContent;
-  const price = parent.querySelector(".price").textContent;
-  carts.push({
-    id: id,
-    title: title,
-    price: price,
-  });
+  const price = Number(parent.querySelector(".price").textContent);
+
+  // check if tree already exists in cart
+  const existing = carts.find((item) => item.id === id);
+
+  if (existing) {
+    existing.quantity += 1; // increase qty
+  } else {
+    carts.push({
+      id: id,
+      title: title,
+      price: price,
+      quantity: 1,
+    });
+  }
+
   showCart(carts);
   showToast(title);
 };
 
-// Function for add tree into cart
+
 const showCart = (carts) => {
-  // alert("added cart")
-  const totalPrice = carts.reduce((acc, cur) => acc + Number(cur.price), 0);
+  const totalPrice = carts.reduce(
+    (acc, cur) => acc + cur.price * cur.quantity,
+    0
+  );
   cartContainer.innerHTML = "";
   mobileCartContainer.innerHTML = "";
+
   carts.forEach((cart) => {
     cartContainer.innerHTML += `
-            <div id="${cart.id}" class="p-2 mb-2 shadow rounded-2xl">
-              <div
-                class="bg-[#F0FDF4] rounded-2xl flex justify-between items-center px-4 py-3 "
-              >
-                <div class="space-y-1">
-                  <h5 class="font-medium">${cart.title}</h5>
-                  <span class="text-gray-400 "
-                    ><i
-                      class="fa-solid fa-bangladeshi-taka-sign text-gray-400 text-sm"
-                    ></i
-                    ><span>${cart.price}</span>
-                    <i class="fa-solid fa-xmark text-gray-400 text-[9px]"></i>
-                    1
-                  </span>
-                </div>
-                <span
-                  ><i onclick="handleDeleteItem(${cart.id})"
-                    class="removeCart fa-solid fa-xmark text-gray-400 text-sm cursor-pointer"
-                  ></i
-                ></span>
-              </div>
-              </div>
+      <div id="${cart.id}" class="p-2 mb-2 shadow rounded-2xl">
+        <div class="bg-[#F0FDF4] rounded-2xl flex justify-between items-center px-4 py-3 ">
+          <div class="space-y-1">
+            <h5 class="font-medium">${cart.title}</h5>
+            <span class="text-gray-400 ">
+              <i class="fa-solid fa-bangladeshi-taka-sign text-gray-400 text-sm"></i>
+              <span>${cart.price} x ${cart.quantity}</span> = 
+              <span>${cart.price * cart.quantity}</span>
+            </span>
+          </div>
+          <span>
+            <i onclick="handleDeleteItem('${cart.id}')"
+              class="removeCart fa-solid fa-xmark text-gray-400 text-sm cursor-pointer"></i>
+          </span>
+        </div>
+      </div>
     `;
-  });
-  carts.forEach((cart) => {
+
     mobileCartContainer.innerHTML += `
-            <div id="${cart.id}" class="p-2 mb-2 shadow rounded-2xl">
-              <div
-                class="bg-[#F0FDF4] rounded-2xl flex justify-between items-center px-4 py-3 "
-              >
-                <div class="space-y-1">
-                  <h5 class="font-medium">${cart.title}</h5>
-                  <span class="text-gray-400 "
-                    ><i
-                      class="fa-solid fa-bangladeshi-taka-sign text-gray-400 text-sm"
-                    ></i
-                    ><span>${cart.price}</span>
-                    <i class="fa-solid fa-xmark text-gray-400 text-[9px]"></i>
-                    1
-                  </span>
-                </div>
-                <span
-                  ><i onclick="handleDeleteItem(${cart.id})"
-                    class="removeCart fa-solid fa-xmark text-gray-400 text-sm cursor-pointer"
-                  ></i
-                ></span>
-              </div>
-              </div>
+      <div id="${cart.id}" class="p-2 mb-2 shadow rounded-2xl">
+        <div class="bg-[#F0FDF4] rounded-2xl flex justify-between items-center px-4 py-3 ">
+          <div class="space-y-1">
+            <h5 class="font-medium">${cart.title}</h5>
+            <span class="text-gray-400 ">
+              <i class="fa-solid fa-bangladeshi-taka-sign text-gray-400 text-sm"></i>
+              <span>${cart.price} x ${cart.quantity}</span> = 
+              <span>${cart.price * cart.quantity}</span>
+            </span>
+          </div>
+          <span>
+            <i onclick="handleDeleteItem('${cart.id}')"
+              class="removeCart fa-solid fa-xmark text-gray-400 text-sm cursor-pointer"></i>
+          </span>
+        </div>
+      </div>
     `;
   });
+
+  // totals
   const divForPc = document.createElement("div");
   divForPc.innerHTML = `
-        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-300">
-            <h4 class="font-medium">Total</h4>
-            <p><i class="fa-solid fa-bangladeshi-taka-sign"></i><span class="font-medium">${totalPrice}</span></p>
-        </div> 
-  `;
+    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-300">
+      <h4 class="font-medium">Total</h4>
+      <p><i class="fa-solid fa-bangladeshi-taka-sign"></i><span class="font-medium">${totalPrice}</span></p>
+    </div>`;
   cartContainer.appendChild(divForPc);
+
   const divForMobile = document.createElement("div");
   divForMobile.innerHTML = `
-        <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-300">
-            <h4 class="font-medium">Total</h4>
-            <p><i class="fa-solid fa-bangladeshi-taka-sign"></i><span class="font-medium">${totalPrice}</span></p>
-        </div> 
-  `;
+    <div class="flex justify-between items-center mt-4 pt-3 border-t border-gray-300">
+      <h4 class="font-medium">Total</h4>
+      <p><i class="fa-solid fa-bangladeshi-taka-sign"></i><span class="font-medium">${totalPrice}</span></p>
+    </div>`;
   mobileCartContainer.appendChild(divForMobile);
-  cartCount.textContent = carts.length;
+
+  // update cart count = total quantity
+  const totalItems = carts.reduce((acc, cur) => acc + cur.quantity, 0);
+  cartCount.textContent = totalItems;
 };
+
 
 // Function for delete item from cart
 const handleDeleteItem = (id) => {
-  const filterredCart = carts.filter((cart) => Number(cart.id) !== id);
-  carts = filterredCart;
+  const existing = carts.find((cart) => cart.id === id);
+  if (existing && existing.quantity > 1) {
+    existing.quantity -= 1;
+  } else {
+    carts = carts.filter((cart) => cart.id !== id);
+  }
   showCart(carts);
 };
+
 
 // === Functioin for  handle view modal===
 const handleViewModal = async (e) => {
